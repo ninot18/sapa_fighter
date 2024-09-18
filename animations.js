@@ -38,7 +38,7 @@ export const createAnimations = (game) => {
     key: 'player2-walk',
     frames: game.anims.generateFrameNumbers(
       'player2',
-      {start: 1, end: 3}
+      {start: 1, end: 5}
     ),
     frameRate: 12,
     repeat: -1
@@ -46,7 +46,7 @@ export const createAnimations = (game) => {
 
   game.anims.create({
     key: 'player2-idle',
-    frames: [{ key: 'player2', frame: 4}]
+    frames: [{ key: 'player2', frame: 0}]
   })
 
   game.anims.create({

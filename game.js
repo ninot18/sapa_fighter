@@ -4,15 +4,15 @@ import { createAnimations } from "./animations.js"
 
 const config = {
   type: Phaser.AUTO, // webgl, canvas
-  width: 1024,
-  height: 476,
+  width: 1280,
+  height: 720,
   backgroundColor: '#049cd8',
   parent: 'game',
   physics: {
     default: 'arcade',
     arcade: {
       gravity: { y: 300 },
-      debug: false
+      debug: true
     }
   },
   scene: {
@@ -28,13 +28,15 @@ new Phaser.Game(config)
 function preload () {
   this.load.image(
     'background',
-    'assets/City1.png'
+    'assets/background_mountains.png'
   )
+
+  this.load.image('platform', 'assets/tileset.png')
 
   this.load.spritesheet(
     'player1', // <--- id
     'assets/1/Walk.png',
-    { frameWidth: 42, frameHeight: 42 }
+    { frameWidth: 42, frameHeight: 29}
   )
 
   this.load.spritesheet(
@@ -45,8 +47,8 @@ function preload () {
 
   this.load.spritesheet(
     'player2',
-    'assets/2/Walk.png',
-    { frameWidth: 42, frameHeight: 42}
+    'assets/2/Walk_2.png',
+    { frameWidth: 42, frameHeight: 28}
   )
 
   // this.load.audio('gameover', 'assets/sound/music/gameover.mp3')
@@ -63,26 +65,34 @@ function create () {
   // image(x, y, id-del-asset)
   this.add.image(0, 0, 'background')
     .setOrigin(0, 0)
-    .setScale(0.6)
+    .setScale(3.5)
 
   this.floor = this.physics.add.staticGroup()
 
+  this.floor.create(20, 680, 'platform').setOrigin(0, 0).setScale(0.2).refreshBody()
+
   this.player1 = this.physics.add.sprite(50, 100, 'player1')
-    .setOrigin(0, 1)
+    .setOrigin(0, 0)
     .setCollideWorldBounds(true)
     .setGravityY(300)
     .setScale(1)
 
-  this.player2 = this.physics.add.sprite(50, 100, 'player2')
-    .setOrigin(0, 1)
+  this.player2 = this.physics.add.sprite(500, 100, 'player2')
+    .setOrigin(0, 0)
     .setCollideWorldBounds(true)
     .setGravityY(300)
     .setScale(1)
   
-  this.physics.world.setBounds(0, 0, 2000, config.height)
+  this.player1.setSize(29, 29, true).refreshBody()
+  this.player2.setSize(29, 29, true).refreshBody()
+  this.cameras.main.setBounds(0, 0, config.width, config.height);
+  this.physics.add.collider(this.player1, this.player2)
   this.physics.add.collider(this.player1, this.floor)
+  this.physics.add.collider(this.player2, this.floor)
 
-  this.cameras.main.setBounds(0, 0, 2000, config.height)
+
+  this.player1.setBounce(0.2);
+  this.player2.setBounce(0.2);
 
   createAnimations(this)
 
@@ -102,17 +112,18 @@ function update () { // 3. continuamente
   //Player 1 controls
   if (this.keys.left.isDown) {
     this.player1.anims.play('player1-walk', true)
-    this.player1.x -= 2
+    this.player1.setVelocityX(-200)
     this.player1.flipX = true
   } else if (this.keys.right.isDown) {
     this.player1.anims.play('player1-walk', true)
-    this.player1.x += 2
+    this.player1.setVelocityX(200)
     this.player1.flipX = false
   } else {
+    this.player1.setVelocityX(0)
     this.player1.anims.play('player1-idle', true)
   }
 
-  if (this.keys.up.isDown) {
+  if (this.keys.up.isDown && this.player1.body.touching.down) {
     this.player1.setVelocityY(-300)
     this.player1.anims.play('player1-jump', true)
   }
@@ -130,17 +141,18 @@ function update () { // 3. continuamente
   // Player 2 controls
   if (keyA.isDown) {
     this.player2.anims.play('player2-walk', true)
-    this.player2.x -= 2
+    this.player2.setVelocityX(-200)
     this.player2.flipX = true
   } else if (keyD.isDown) {
     this.player2.anims.play('player2-walk', true)
-    this.player2.x += 2
+    this.player2.setVelocityX(200)
     this.player2.flipX = false
   } else {
+    this.player2.setVelocityX(0)
     this.player2.anims.play('player2-idle', true)
   }
 
-  if (keyW.isDown) {
+  if (keyW.isDown && this.player2.body.touching.down) {
     this.player2.setVelocityY(-300)
     this.player2.anims.play('player2-jump', true)
   }
