@@ -69,24 +69,27 @@ function create () {
 
   this.floor = this.physics.add.staticGroup()
 
-  this.floor.create(20, 680, 'platform').setOrigin(0, 0).setScale(0.2).refreshBody()
+  this.floor.create(20, 680, 'platform').setOrigin(0, 0).setScale(0.3).refreshBody()
 
   this.player1 = this.physics.add.sprite(50, 100, 'player1')
     .setOrigin(0, 0)
     .setCollideWorldBounds(true)
     .setGravityY(300)
     .setScale(1)
+  
 
   this.player2 = this.physics.add.sprite(500, 100, 'player2')
     .setOrigin(0, 0)
     .setCollideWorldBounds(true)
     .setGravityY(300)
     .setScale(1)
-  
-  this.player1.setSize(29, 29, true).refreshBody()
-  this.player2.setSize(29, 29, true).refreshBody()
+
+  this.player2.flipX = true
+
+  this.player1.setSize(29, 29).refreshBody()
+  this.player2.setSize(29, 29).refreshBody()
   this.cameras.main.setBounds(0, 0, config.width, config.height);
-  this.physics.add.collider(this.player1, this.player2)
+  this.physics.add.collider(this.player1, this.player2, onPlayerContact, null, this)
   this.physics.add.collider(this.player1, this.floor)
   this.physics.add.collider(this.player2, this.floor)
 
@@ -108,6 +111,8 @@ function create () {
 
 function update () { // 3. continuamente
   if (this.player1.isDead) return
+
+  // if (!this.player2)
 
   //Player 1 controls
   if (this.keys.left.isDown) {
@@ -162,6 +167,11 @@ function update () { // 3. continuamente
     this.player2.anims.play('player2-jump', true)
   }
 
+  // Combat controls
+
+
+
+
   // if (this.player1.y >= config.height) {
   //   this.player1.isDead = true
   //   this.player1.anims.play('mario-dead')
@@ -176,4 +186,22 @@ function update () { // 3. continuamente
     //     this.scene.restart()
     //   }, 2000)
     // }
+}
+
+function onPlayerContact(player1, player2) {
+  console.log('Se tocan')
+  if (keyL.isDown) {
+    console.log('Entra en el bucle')
+    if (player1.x < player2.x) {
+      // Player1 está a la izquierda, empujamos a Player2 hacia la derecha
+      console.log('desplaza a la iz')
+      player2.x += 50; 
+    } else {
+      // Player1 está a la derecha, empujamos a Player2 hacia la izquierda
+      console.log('desplaza a la der')
+      player2.x -= 50; 
+    }
+  }
+
+  
 }
