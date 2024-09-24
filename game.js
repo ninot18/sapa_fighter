@@ -12,7 +12,7 @@ const config = {
     default: 'arcade',
     arcade: {
       gravity: { y: 300 },
-      debug: true
+      debug: false
     }
   },
   scene: {
@@ -41,7 +41,7 @@ function preload () {
 
   this.load.spritesheet(
     'player1-attacks',
-    'assets/1/Attack2.png',
+    'assets/1/Attack1.png',
     { frameWidth: 42, frameHeight: 42}
   )
 
@@ -51,7 +51,13 @@ function preload () {
     { frameWidth: 42, frameHeight: 28}
   )
 
-  // this.load.audio('gameover', 'assets/sound/music/gameover.mp3')
+  this.load.spritesheet(
+    'player2-attacks',
+    'assets/2/Attack1.png',
+    { frameWidth: 42, frameHeight: 42}
+  )
+
+
 } // 1.
 
 let keyA;
@@ -62,14 +68,18 @@ let keyL;
 let keyQ;
 
 function create () {
-  // image(x, y, id-del-asset)
+  
   this.add.image(0, 0, 'background')
     .setOrigin(0, 0)
     .setScale(3.5)
 
   this.floor = this.physics.add.staticGroup()
 
-  this.floor.create(20, 680, 'platform').setOrigin(0, 0).setScale(0.3).refreshBody()
+  this.floor.create(20, 200, 'platform').setOrigin(0, 0).setScale(0.1).refreshBody()
+  this.floor.create(200, 600, 'platform').setOrigin(0, 0).setScale(0.1).refreshBody()
+  this.floor.create(550, 500, 'platform').setOrigin(0, 0).setScale(0.1).refreshBody()
+  this.floor.create(500, 300, 'platform').setOrigin(0, 0).setScale(0.15).refreshBody()
+  this.floor.create(800, 600, 'platform').setOrigin(0, 0).setScale(0.15).refreshBody()
 
   this.player1 = this.physics.add.sprite(50, 100, 'player1')
     .setOrigin(0, 0)
@@ -111,8 +121,8 @@ function create () {
 
 function update () { // 3. continuamente
   if (this.player1.isDead) return
+  if (this.player2.isDead) return
 
-  // if (!this.player2)
 
   //Player 1 controls
   if (this.keys.left.isDown) {
@@ -129,7 +139,7 @@ function update () { // 3. continuamente
   }
 
   if (this.keys.up.isDown && this.player1.body.touching.down) {
-    this.player1.setVelocityY(-300)
+    this.player1.setVelocityY(-400)
     this.player1.anims.play('player1-jump', true)
   }
 
@@ -158,7 +168,7 @@ function update () { // 3. continuamente
   }
 
   if (keyW.isDown && this.player2.body.touching.down) {
-    this.player2.setVelocityY(-300)
+    this.player2.setVelocityY(-400)
     this.player2.anims.play('player2-jump', true)
   }
 
@@ -166,42 +176,71 @@ function update () { // 3. continuamente
     this.player2.setVelocityY(300)
     this.player2.anims.play('player2-jump', true)
   }
+  if (keyQ.isDown) {
+    this.player2.anims.play('player2-attack', true)
+  }
 
   // Combat controls
 
 
 
 
-  // if (this.player1.y >= config.height) {
-  //   this.player1.isDead = true
-  //   this.player1.anims.play('mario-dead')
-  //   this.player1.setCollideWorldBounds(false)
-    // this.sound.add('gameover', { volume: 0.2 }).play()
+  if (this.player1.y >= 600) {
+    console.log('muerto')
+    this.player1.isDead = true
+    this.player1.anims.play('player1-iddle')
+    this.player1.setCollideWorldBounds(false)
 
-    //   setTimeout(() => {
-    //     this.player1.setVelocityY(-350)
-    //   }, 100)
+    setTimeout(() => {
+      this.player1.setVelocityY(-350)
+    }, 100)
 
-    //   setTimeout(() => {
-    //     this.scene.restart()
-    //   }, 2000)
-    // }
+    setTimeout(() => {
+      this.scene.restart()
+    }, 2000)
+  }
+
+  if (this.player2.y >= 600) {
+    console.log('muerto')
+    this.player2.isDead = true
+    this.player2.anims.play('player2-iddle')
+    this.player2.setCollideWorldBounds(false)
+
+    setTimeout(() => {
+      this.player2.setVelocityY(-350)
+    }, 100)
+
+    setTimeout(() => {
+      this.scene.restart()
+    }, 2000)
+  }
 }
 
 function onPlayerContact(player1, player2) {
-  console.log('Se tocan')
+
   if (keyL.isDown) {
-    console.log('Entra en el bucle')
+  
     if (player1.x < player2.x) {
       // Player1 está a la izquierda, empujamos a Player2 hacia la derecha
-      console.log('desplaza a la iz')
+      
       player2.x += 50; 
     } else {
       // Player1 está a la derecha, empujamos a Player2 hacia la izquierda
-      console.log('desplaza a la der')
+      
       player2.x -= 50; 
     }
   }
 
-  
+  if (keyQ.isDown) {
+    
+    if (player2.x < player1.x) {
+      // Player2 está a la izquierda, empujamos a Player1 hacia la derecha
+      
+      player1.x += 50; 
+    } else {
+      // Player2 está a la derecha, empujamos a Player1 hacia la izquierda
+      
+      player1.x -= 50; 
+    }
+  }
 }
